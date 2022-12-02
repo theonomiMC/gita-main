@@ -4,19 +4,18 @@ import { Container } from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import { Input } from "../components/Input";
 
-const Edit = ({ products }) => {
+const Edit = ({ products, handleUpdate }) => {
   const navigate = useNavigate();
   let { productID } = useParams();
-  const product = products.find((p) => p.id === Number(productID));
-
+  const product = products.find((p) => Number(p.id) === Number(productID));
   const [nameErr, setNameErr] = useState("The Name field is required.");
   const [numErr, setNumErr] = useState("The productNumber field is required.");
   const [priceErr, setPriceErr] = useState(
     "The List price should be between 0.1 and 10000."
   );
   const [state, setState] = useState({
-    name: product?.title || "",
-    productNumber: product?.id || "",
+    title: product?.title || "",
+    id: product?.id || "",
     color: product?.color || "",
     cost: product?.cost || "",
     price: product?.price || "",
@@ -30,19 +29,20 @@ const Edit = ({ products }) => {
     try {
       let data = new FormData(e.target);
       if (
-        state.name &&
-        state.productNumber &&
+        state.title &&
+        state.id &&
         state.price >= 0.1 &&
         state.price <= 1000
       ) {
-        let editedProduct = Object.fromEntries(data.entries());
-        console.log(editedProduct);
-
-        // fetch(`https://dummyjson.com/products/${state.productNumber}`, {
-        //   method: "PUT",
-        //   body: JSON.stringify(editedProduct),
-        //   headers: { "Content-type": "application/json; charset=UTF-8" },
-        // });
+        let obj = Object.fromEntries(data.entries());
+        let editedProduct = {
+          ...product,
+          ...obj,
+          id: Number(obj.id),
+          modified_date: new Date(Date.now()).toLocaleDateString(),
+        };
+        handleUpdate(editedProduct);
+        navigate("/");
       } else {
         console.log("wrong inputs");
       }
@@ -56,12 +56,12 @@ const Edit = ({ products }) => {
   };
 
   React.useEffect(() => {
-    if (state.name) {
+    if (state.title) {
       setNameErr();
     } else {
       setNameErr("The Name field is required.");
     }
-    if (state.productNumber) {
+    if (state.id) {
       setNumErr("");
     } else {
       setNumErr("The productNumber field is required.");
@@ -71,7 +71,7 @@ const Edit = ({ products }) => {
     } else {
       setPriceErr("The List price should be between 0.1 and 10000.");
     }
-  }, [state.name, state.productNumber, state.price]);
+  }, [state.title, state.id, state.price]);
 
   return (
     <Container>
@@ -82,9 +82,9 @@ const Edit = ({ products }) => {
           <Input
             id="name"
             type="text"
-            value={state.name}
+            value={state.title}
             onChange={onChange}
-            name="name"
+            name="title"
             error={nameErr}
             placeholder="Product name .."
             required
@@ -96,9 +96,9 @@ const Edit = ({ products }) => {
           <Input
             id="number"
             type="number"
-            value={state.productNumber}
+            value={state.id}
             onChange={onChange}
-            name="productNumber"
+            name="id"
             error={numErr}
             placeholder="Product number .."
             required

@@ -6,23 +6,43 @@ import Edit from "./pages/Edit";
 import Delete from "./pages/Delete";
 import CreateNew from "./pages/CreateNew";
 import Products from "./pages/Products";
+import { data } from "./data";
 import "./App.css";
 
 function App() {
-  const [products, setProducts] = useState([]);
-
-  const fetchProducts = async () => {
-    try {
-      let response = await fetch("https://dummyjson.com/products");
-      let data = await response.json();
-      setProducts(data.products);
-    } catch (e) {
-      console.log(e.message);
-    }
+  const [products, setProducts] = useState(data);
+  // const fetchProducts = async () => {
+  //   try {
+  //     let response = await fetch("https://dummyjson.com/products");
+  //     let data = await response.json();
+  //     // let st = localStorage.setItem("products", data.products);
+  //     // setProducts(st);
+  //     console.log(data.products);
+  //     setProducts(data.products);
+  //   } catch (e) {
+  //     console.log(e.message);
+  //   }
+  // };
+  // useEffect(() => {
+  //   fetchProducts();
+  // }, []);
+  const handleDelete = (id) => {
+    let newData = products.filter((el) => el.id !== id);
+    setProducts(newData);
   };
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+  const handleCreate = (product) => {
+    let newData = [...products, { ...product }];
+    setProducts(newData);
+  };
+  const handleUpdate = (newP) => {
+    let updatedProducts = products.map((el) => {
+      if (Number(newP.id) === Number(el.id)) {
+        return { ...el, ...newP };
+      }
+      return el;
+    });
+    setProducts(updatedProducts);
+  };
   return (
     <Router>
       <Header />
@@ -33,14 +53,24 @@ function App() {
           <Route path="orders" element={<ComingSoon name={"orders"} />} />
           <Route path="reports" element={<ComingSoon name={"reports"} />} />
           <Route path="edit">
-            <Route path=":productID" element={<Edit products={products} />} />
+            <Route
+              path=":productID"
+              element={<Edit products={products} handleUpdate={handleUpdate} />}
+            />
           </Route>
           <Route path="delete">
-            <Route path=":productID" element={<Delete products={products} />} />
+            <Route
+              path=":productID"
+              element={
+                <Delete products={products} handleDelete={handleDelete} />
+              }
+            />
           </Route>
+          <Route
+            path="create-new-product"
+            element={<CreateNew handleCreate={handleCreate} />}
+          />
         </Route>
-
-        <Route path="create-new-product" element={<CreateNew />} />
       </Routes>
     </Router>
   );

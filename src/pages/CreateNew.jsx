@@ -4,7 +4,7 @@ import Button from "react-bootstrap/Button";
 import { useNavigate } from "react-router-dom";
 import { Input } from "../components/Input";
 
-const CreateNew = () => {
+const CreateNew = ({ handleCreate }) => {
   const navigate = useNavigate();
   const [nameErr, setNameErr] = useState("The Name field is required.");
   const [numErr, setNumErr] = useState("The productNumber field is required.");
@@ -12,8 +12,8 @@ const CreateNew = () => {
     "The List price should be between 0.1 and 10000."
   );
   const [state, setState] = useState({
-    name: "",
-    productNumber: Date.now(),
+    title: "",
+    id: Number(Date.now()),
     color: "",
     cost: "",
     price: "",
@@ -25,19 +25,10 @@ const CreateNew = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     let data = new FormData(e.target);
-    if (
-      state.name &&
-      state.productNumber &&
-      state.price >= 0.1 &&
-      state.price <= 10000
-    ) {
+    if (state.title && state.id && state.price >= 0.1 && state.price <= 10000) {
       let newProduct = Object.fromEntries(data.entries());
-      console.log("Submited", newProduct);
-      // fetch(`https://dummyjson.com/products/${state.productNumber}`, {
-      //   method: "POST",
-      //   body: JSON.stringify(newProduct),
-      //   headers: { "Content-type": "application/json; charset=UTF-8" },
-      // });
+      handleCreate({ ...newProduct });
+      navigate("/");
     } else {
       console.log("wrong");
     }
@@ -49,12 +40,12 @@ const CreateNew = () => {
 
   // Track field changes to set errors
   React.useEffect(() => {
-    if (state.name) {
+    if (state.title) {
       setNameErr();
     } else {
       setNameErr("The Name field is required.");
     }
-    if (state.productNumber) {
+    if (state.id) {
       setNumErr("");
     } else {
       setNumErr("The productNumber field is required.");
@@ -64,7 +55,7 @@ const CreateNew = () => {
     } else {
       setPriceErr("The List price should be between 0.1 and 10000.");
     }
-  }, [state.name, state.productNumber, state.price]);
+  }, [state.title, state.id, state.price]);
   return (
     <Container>
       <h1>Create a new Product</h1>
@@ -74,9 +65,9 @@ const CreateNew = () => {
         <Input
           id="name"
           type="text"
-          value={state.name}
+          value={state.title}
           onChange={onChange}
-          name="name"
+          name="title"
           error={nameErr}
           placeholder="Product name .."
           required
@@ -87,9 +78,9 @@ const CreateNew = () => {
         <Input
           id="number"
           type="number"
-          value={state.productNumber}
+          value={state.id}
           onChange={onChange}
-          name="productNumber"
+          name="id"
           required
           error={numErr}
           placeholder="Product number .."

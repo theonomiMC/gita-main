@@ -21,9 +21,9 @@ const ProductTable = ({ products }) => {
             <tr key={p.id}>
               <td>{p.title}</td>
               <td>{p.id}</td>
-              <td>color</td>
+              <td>{p?.color}</td>
               <td>{p?.price}</td>
-              <td>Modified Date</td>
+              <td>{p?.modified_date}</td>
               <td>
                 <Actions p={p} />
               </td>
